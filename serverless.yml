@@ -1,48 +1,51 @@
 service: notes-app-api
-# Create an optimized package for our functions
+
+
 package:
-individually: true
+  individually: true
+
 plugins:
-- serverless-bundle # Package our functions with Webpack
+  - serverless-bundle 
+  - serverless-offline
+  - serverless-dotenv-plugin 
 
-- serverless-offline
-- serverless-dotenv-plugin # Load .env as environment
-variables
 provider:
-name: aws
-runtime: nodejs12.x
-stage: prod
-region: us-east-1
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
 
-# # NOTE: update this with your service name
-# service: notes-app-api
+  environment:
+    tableName: notes
 
-# # Create an optimized package for our functions 
-# package:
-#   individually: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
 
-# plugins:
-#   - serverless-bundle # Package our functions with Webpack
-#   - serverless-offline
-#   - serverless-dotenv-plugin # Load .env as environment variables
+      Resource: "arn:aws:cognito-idp:us-east-1:854829648020:userpool/us-east-1_g8n0kbh5F"
 
-# provider:
-#   name: aws
-#   runtime: nodejs10.x
-#   stage: dev
-#   region: us-east-1
-#   # To load environment variables externally
-#   # rename env.example to .env and uncomment
-#   # the following line. Also, make sure to not
-#   # commit your .env.
-#   #
-#   #environment:
-#   #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
+functions:
 
-# functions:
-#   hello:
-#     handler: handler.hello
-#     events:
-#       - http:
-#           path: hello
-#           method: get
+  create:
+    handler: create.main
+    events:
+      - http:
+          path: notes
+          method: post
+          cors: true
+          authorizer: aws_iam
+  get:
+    handler: get.main
+    events:
+    - http:
+      path: notes/{id}
+      method: get
+      cors: true
+      authorizer: aws_iam
