@@ -1,6 +1,5 @@
 service: notes-app-api
 
-
 package:
   individually: true
 
@@ -8,13 +7,13 @@ plugins:
   - serverless-bundle 
   - serverless-offline
   - serverless-dotenv-plugin 
-
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: dev
+  stage: prod
   region: us-east-1
 
+  
   environment:
     tableName: notes
     stripeSecretKey: ${env:STRIPE_SECRET_KEY}
@@ -29,11 +28,9 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-
-      Resource: "arn:aws:cognito-idp:us-east-1:854829648020:userpool/us-east-1_g8n0kbh5F"
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
 functions:
-
   create:
     handler: create.main
     events:
@@ -42,22 +39,25 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
+
   get:
     handler: get.main
     events:
-    - http:
-      path: notes/{id}
-      method: get
-      cors: true
-      authorizer: aws_iam
+      - http:
+          path: notes/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+
   list:
     handler: list.main
     events:
       - http:
-        path: notes
-        method: get
-        cors: true
-        authorizer: aws_iam
+          path: notes
+          method: get
+          cors: true
+          authorizer: aws_iam
+
   update:
     handler: update.main
     events:
@@ -66,6 +66,7 @@ functions:
           method: put
           cors: true
           authorizer: aws_iam
+
   delete:
     handler: delete.main
     events:
@@ -74,6 +75,7 @@ functions:
           method: delete
           cors: true
           authorizer: aws_iam
+
   billing:
     handler: billing.main
     events:
@@ -82,3 +84,6 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
+
+resources:
+  - ${file(resources/api-gateway-errors.yml)}
