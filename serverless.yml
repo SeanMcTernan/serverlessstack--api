@@ -28,7 +28,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+      Resource: "arn:aws:cognito-idp:us-east-1:854829648020:userpool/us-east-1_g8n0kbh5F"
 
 functions:
   create:
@@ -87,3 +87,6 @@ functions:
 
 resources:
   - ${file(resources/api-gateway-errors.yml)}
+
+
+  
