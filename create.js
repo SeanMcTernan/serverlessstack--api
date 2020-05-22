@@ -19,8 +19,3 @@ export const main = handler(async (event, context) => {
 
   return params.Item;
 });
-
-
-
-
-
